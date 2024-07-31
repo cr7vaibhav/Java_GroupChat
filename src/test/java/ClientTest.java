@@ -6,4 +6,16 @@ class ClientTest {
     @Test
     void sendMessage() {
       }
+
+    @Test
+    void listenForMessage() {
+      }
+
+    @Test
+    void closeEverything() {
+      }
+
+    @Test
+    void main() {
+      }
 }
