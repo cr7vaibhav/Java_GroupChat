@@ -1,5 +1,4 @@
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -16,6 +15,7 @@ public class Client {
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.username = username;
         } catch (IOException e) {
+            e.printStackTrace();
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
@@ -34,33 +34,33 @@ public class Client {
                 bufferedWriter.flush();
             }
         } catch (IOException e) {
+            e.printStackTrace();
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
 
-    public void
-    listenForMessage() { // listens for messages from other users , its is  a blocking operation,
-        // so we use a new thread
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        String messageFromGroupChat;
-                        while (socket.isConnected()) {
-                            try {
-                                messageFromGroupChat = bufferedReader.readLine();
-                                System.out.println(messageFromGroupChat);
-                            } catch (IOException e) {
-                                closeEverything(socket, bufferedReader, bufferedWriter);
-                            }
+    public void listenForMessage() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String messageFromGroupChat;
+                while (socket.isConnected()) {
+                    try {
+                        messageFromGroupChat = bufferedReader.readLine();
+                        if (messageFromGroupChat != null) {
+                            System.out.println(messageFromGroupChat);
                         }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        closeEverything(socket, bufferedReader, bufferedWriter);
+                        break;
                     }
-                })
-                .start();
+                }
+            }
+        }).start();
     }
 
-    public void closeEverything(
-            Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
+    public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
         try {
             if (bufferedReader != null) {
                 bufferedReader.close();
@@ -86,6 +86,5 @@ public class Client {
         Client client = new Client(socket, username);
         client.listenForMessage();
         client.sendMessage();
-        // both methods are blocking since they are infinite while loops they are on separate threads
     }
 }

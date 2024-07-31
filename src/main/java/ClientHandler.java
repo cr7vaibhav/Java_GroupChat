@@ -20,7 +20,7 @@ public class ClientHandler implements Runnable {
           new BufferedReader(new InputStreamReader(socket.getInputStream())); // read
       this.clientUsername = bufferedReader.readLine();
       clientHandlers.add(this);
-      broadcastMessage("SERVER" + clientUsername + "has entered the chat!");
+      broadcastMessage("SERVER: " + clientUsername + " has entered the chat!");
     } catch (IOException e) {
       closeEverything(socket, bufferedReader, bufferedWriter);
     }
@@ -33,7 +33,7 @@ public class ClientHandler implements Runnable {
     // waiting for messages and another for the rest of the application
     String messageFromClient;
 
-    while (socket.isClosed()) {
+    while (!(socket.isClosed())) {
       try {
         messageFromClient =
             bufferedReader
@@ -47,11 +47,11 @@ public class ClientHandler implements Runnable {
     }
   }
 
-  public void broadcastMessage(String messasgetoSend) {
+  public void broadcastMessage(String messagetoSend) {
     for (ClientHandler clientHandler : clientHandlers) {
       try {
         if (!clientHandler.clientUsername.equals(clientUsername)) {
-          clientHandler.bufferedWriter.write(messasgetoSend);
+          clientHandler.bufferedWriter.write(messagetoSend);
           clientHandler.bufferedWriter.newLine();
           clientHandler.bufferedWriter.flush();
         }
